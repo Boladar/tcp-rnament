@@ -9,8 +9,6 @@ import org.springframework.integration.ip.tcp.connection.AbstractServerConnectio
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-
 @Component
 @MessageEndpoint
 @Slf4j
@@ -18,17 +16,12 @@ import java.nio.charset.StandardCharsets;
 @DependsOn("gateway")
 public class TcpController {
 
-    private final AbstractServerConnectionFactory connectionFactory;
-    private final Gateway gateway;
+    private final TournamentProtocolServerApplication tournamentProtocolServerApplication;
 
     @ServiceActivator(inputChannel = "fromTcp", outputChannel = "toTcp")
-    public byte[] handleMessage(Message<?> message) {
-        String text = new String((byte[]) message.getPayload(), StandardCharsets.UTF_8);
-        log.info("Incoming msg : [body: {}]", text);
-
-        if (text.equals("1"))
-            connectionFactory.getOpenConnectionIds().forEach(s -> gateway.send("DUPA", s));
-
-        return "ACK".getBytes(StandardCharsets.UTF_8);
+    public void handleMessage(Message<?> message) {
+        byte[] bytes = (byte[]) message.getPayload();
+        String connectionId = String.valueOf(message.getHeaders().get("ip_connectionId"));
+        tournamentProtocolServerApplication.parse(bytes, connectionId);
     }
 }

@@ -9,6 +9,7 @@ import org.example.tcprnament.shared.commands.CommandSide;
 @Setter
 public class ClientCommand extends Command {
     protected ClientCommandType type;
+    protected String connectionId;
 
     public ClientCommand(ClientCommandType type) {
         super(CommandSide.CLIENT);

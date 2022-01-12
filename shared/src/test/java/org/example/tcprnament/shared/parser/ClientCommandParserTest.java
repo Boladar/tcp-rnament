@@ -40,7 +40,7 @@ class ClientCommandParserTest {
         ClientCommand command = new CreateGameCommand("abc", "abc");
         byte[] bytes = SerializationUtils.serialize(command);
 
-        parser.parse(bytes);
+        parser.parse(bytes, null);
 
     }
 }

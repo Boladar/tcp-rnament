@@ -11,5 +11,5 @@ import org.springframework.messaging.handler.annotation.Payload;
 @MessagingGateway(defaultRequestChannel = "toTcp")
 public interface Gateway {
     //void send(String in);
-    void send(@Payload String data, @Header(IpHeaders.CONNECTION_ID) String connectionId);
+    void send(@Payload byte[] data, @Header(IpHeaders.CONNECTION_ID) String connectionId);
 }

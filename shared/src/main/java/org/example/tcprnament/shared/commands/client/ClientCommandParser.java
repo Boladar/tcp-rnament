@@ -1,7 +1,6 @@
 package org.example.tcprnament.shared.commands.client;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.tcprnament.shared.commands.Command;
 import org.example.tcprnament.shared.commands.client.concrete.CreateGameCommand;
 import org.example.tcprnament.shared.commands.client.concrete.JoinGameCommand;
 import org.example.tcprnament.shared.parser.CommandParser;
@@ -10,8 +9,7 @@ import org.example.tcprnament.shared.parser.CommandParser;
 public abstract class ClientCommandParser extends CommandParser {
 
     @Override
-    protected void parseClientCommand(Command command) {
-        ClientCommand clientCommand = (ClientCommand) command;
+    protected void parseClientCommand(ClientCommand clientCommand) {
         log.info("Parsing {} command", clientCommand.getType());
         switch (clientCommand.getType()) {
             case CREATE_GAME:
