@@ -26,7 +26,11 @@ public abstract class CommandParser {
 
     }
 
-    protected abstract void parseServerCommand(Command command);
+    protected void parseServerCommand(Command command) {
 
-    protected abstract void parseClientCommand(Command command);
+    }
+
+    protected void parseClientCommand(Command command) {
+
+    }
 }

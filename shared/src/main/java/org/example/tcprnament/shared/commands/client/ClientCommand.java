@@ -1,7 +1,9 @@
-package org.example.tcprnament.shared.commands;
+package org.example.tcprnament.shared.commands.client;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.example.tcprnament.shared.commands.Command;
+import org.example.tcprnament.shared.commands.CommandSide;
 
 @Getter
 @Setter

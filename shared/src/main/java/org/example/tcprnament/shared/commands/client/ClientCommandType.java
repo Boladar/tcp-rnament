@@ -1,4 +1,4 @@
-package org.example.tcprnament.shared.commands;
+package org.example.tcprnament.shared.commands.client;
 
 public enum ClientCommandType {
     CREATE_GAME,

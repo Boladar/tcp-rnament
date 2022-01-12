@@ -1,4 +1,4 @@
-package org.example.tcprnament.shared.commands;
+package org.example.tcprnament.shared.commands.server;
 
 public enum ServerCommandType {
     GAME_CREATED,
