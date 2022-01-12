@@ -1,10 +1,10 @@
-package org.example.tcprnament.shared;
+package org.example.tcprnament.shared.model;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class TestClass {
+public class Game {
     private String name;
 }
