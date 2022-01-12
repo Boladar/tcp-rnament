@@ -20,6 +20,7 @@ public class TcpController {
 
     @ServiceActivator(inputChannel = "fromTcp", outputChannel = "toTcp")
     public void handleMessage(Message<?> message) {
+        log.info("Got new message");
         byte[] bytes = (byte[]) message.getPayload();
         String connectionId = String.valueOf(message.getHeaders().get("ip_connectionId"));
         tournamentProtocolServerApplication.parse(bytes, connectionId);

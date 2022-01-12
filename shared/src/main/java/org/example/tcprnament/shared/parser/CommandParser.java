@@ -4,9 +4,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 import org.example.tcprnament.shared.commands.Command;
 import org.example.tcprnament.shared.commands.client.ClientCommand;
+import org.springframework.integration.ip.tcp.serializer.ByteArrayCrLfSerializer;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 @Slf4j
 public abstract class CommandParser {
+
+    private final ByteArrayCrLfSerializer byteArrayCrLfSerializer = new ByteArrayCrLfSerializer();
+
+    public void write(Command command, OutputStream outputStream) throws IOException {
+        byte[] message = serialize(command);
+        byteArrayCrLfSerializer.serialize(message, outputStream);
+    }
 
     public byte[] serialize(Command command) {
         return SerializationUtils.serialize(command);

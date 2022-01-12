@@ -2,6 +2,7 @@ package org.example.tcprnament.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.tcprnament.shared.commands.client.concrete.CreateGameCommand;
+import org.springframework.integration.ip.tcp.serializer.ByteArrayCrLfSerializer;
 
 import java.io.*;
 import java.net.Socket;
@@ -20,10 +21,11 @@ public class ClientApplication {
 
 
     void SendToServer(byte[] message) throws Exception {
-        String newline = "/r/n";
-        byte[] n =newline.getBytes();
-        //BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(clientSocket.getOutputStream()
-        clientSocket.getOutputStream().write(message);
+        byte[] newline = "/r/n".getBytes();
+        OutputStream outputStream = clientSocket.getOutputStream();
+        outputStream.write(message);
+        outputStream.write(newline);
+        outputStream.flush();
     }
 
     String ReceiveFromServer() throws Exception {
@@ -39,9 +41,11 @@ public class ClientApplication {
         log.error("error");
 
         ClientApplication client = new ClientApplication();
-        client.SendToServer(tournamentProtocolApplication.serialize(new CreateGameCommand("dupa","dupa1")));
+        tournamentProtocolApplication.write(new CreateGameCommand("dupa", "dupa1"),clientSocket.getOutputStream());
+        ByteArrayCrLfSerializer byteArrayCrLfSerializer = new ByteArrayCrLfSerializer();
 
-        byte[] message = client.ReceiveFromServer().getBytes();
+        byte[] message = new byte[Short.MAX_VALUE];
+        byteArrayCrLfSerializer.doDeserialize(clientSocket.getInputStream(),message);
         tournamentProtocolApplication.parse(message, null);
         clientSocket.close();
     }

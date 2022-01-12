@@ -13,7 +13,7 @@ import org.springframework.integration.ip.tcp.TcpSendingMessageHandler;
 import org.springframework.integration.ip.tcp.connection.AbstractServerConnectionFactory;
 import org.springframework.integration.ip.tcp.connection.TcpConnectionEvent;
 import org.springframework.integration.ip.tcp.connection.TcpNetServerConnectionFactory;
-import org.springframework.integration.ip.tcp.serializer.TcpCodecs;
+import org.springframework.integration.ip.tcp.serializer.*;
 import org.springframework.messaging.MessageChannel;
 
 @Slf4j
@@ -28,8 +28,8 @@ public class TcpServerConfiguration implements ApplicationListener<TcpConnection
     public AbstractServerConnectionFactory tcpServer() {
         log.info("Starting TCP server with port: {}", tcpServerProperties.getPort());
         TcpNetServerConnectionFactory serverCf = new TcpNetServerConnectionFactory(tcpServerProperties.getPort());
-        serverCf.setSerializer(TcpCodecs.crlf());
-        serverCf.setDeserializer(TcpCodecs.crlf());
+        serverCf.setSerializer(new ByteArrayCrLfSerializer());
+        serverCf.setDeserializer(new ByteArrayCrLfSerializer());
         serverCf.setSoTcpNoDelay(true);
         serverCf.setSoKeepAlive(true);
         return serverCf;
