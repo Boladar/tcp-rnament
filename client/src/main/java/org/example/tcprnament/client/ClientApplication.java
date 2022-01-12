@@ -1,6 +1,7 @@
 package org.example.tcprnament.client;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.tcprnament.shared.commands.client.concrete.CreateGameCommand;
 
 import java.io.*;
 import java.net.Socket;
@@ -18,10 +19,11 @@ public class ClientApplication {
     }
 
 
-    void SendToServer(String message) throws Exception {
-        PrintWriter out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-        out.print(message + "\r\n");
-        out.flush();
+    void SendToServer(byte[] message) throws Exception {
+        String newline = "/r/n";
+        byte[] n =newline.getBytes();
+        //BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(clientSocket.getOutputStream()
+        clientSocket.getOutputStream().write(message);
     }
 
     String ReceiveFromServer() throws Exception {
@@ -30,13 +32,17 @@ public class ClientApplication {
     }
 
     public static void main(String[] args) throws Exception {
+
+        TournamentProtocolApplication tournamentProtocolApplication = new TournamentProtocolApplication();
         log.info("--------------------Starting client application-------------------------");
         log.info("test");
         log.error("error");
 
         ClientApplication client = new ClientApplication();
-        client.SendToServer("1");
-        System.out.println(client.ReceiveFromServer());
+        client.SendToServer(tournamentProtocolApplication.serialize(new CreateGameCommand("dupa","dupa1")));
+
+        byte[] message = client.ReceiveFromServer().getBytes();
+        tournamentProtocolApplication.parse(message, null);
         clientSocket.close();
     }
 
