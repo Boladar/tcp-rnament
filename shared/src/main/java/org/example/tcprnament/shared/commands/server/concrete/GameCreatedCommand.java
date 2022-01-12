@@ -10,8 +10,8 @@ import org.example.tcprnament.shared.commands.server.ServerCommandType;
 public class GameCreatedCommand extends ServerCommand {
     private String name;
 
-    public GameCreatedCommand(ServerCommandType type, String name) {
-        super(type);
+    public GameCreatedCommand(String name) {
+        super(ServerCommandType.GAME_CREATED);
         this.name = name;
     }
 }

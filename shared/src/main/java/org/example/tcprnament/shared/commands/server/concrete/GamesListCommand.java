@@ -13,8 +13,8 @@ import java.util.List;
 public class GamesListCommand extends ServerCommand {
     private List<Game> games;
 
-    public GamesListCommand(ServerCommandType type, List<Game> games) {
-        super(type);
+    public GamesListCommand(List<Game> games) {
+        super(ServerCommandType.GAMES_LIST);
         this.games = games;
     }
 }

@@ -11,7 +11,7 @@ public class GameJoinedCommand extends ServerCommand {
     private String name;
 
     public GameJoinedCommand(ServerCommandType type, String name) {
-        super(type);
+        super(ServerCommandType.GAME_JOINED);
         this.name = name;
     }
 }
