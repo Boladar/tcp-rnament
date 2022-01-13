@@ -11,8 +11,8 @@ public class CreateGameCommand extends ClientCommand {
     private String name;
     private String password;
 
-    public CreateGameCommand(String name, String password) {
-        super(ClientCommandType.CREATE_GAME);
+    public CreateGameCommand(Long id, String name, String password) {
+        super(id, ClientCommandType.CREATE_GAME);
         this.name = name;
         this.password = password;
     }

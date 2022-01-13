@@ -21,6 +21,9 @@ public abstract class ClientCommandParser extends CommandParser {
             case JOIN_GAME:
                 onJoinGame((JoinGameCommand) clientCommand);
                 break;
+            case LEAVE_GAME:
+                onLeaveGame(clientCommand);
+                break;
             case START_GAME:
                 onStartGame(clientCommand);
                 break;
@@ -34,4 +37,6 @@ public abstract class ClientCommandParser extends CommandParser {
     protected abstract void onJoinGame(JoinGameCommand command);
 
     protected abstract void onStartGame(ClientCommand command);
+
+    protected abstract void onLeaveGame(ClientCommand command);
 }

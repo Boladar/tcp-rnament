@@ -41,7 +41,7 @@ public class ClientApplication {
         log.error("error");
 
         ClientApplication client = new ClientApplication();
-        tournamentProtocolApplication.write(new CreateGameCommand("dupa", "dupa1"),clientSocket.getOutputStream());
+        tournamentProtocolApplication.write(new CreateGameCommand(1L,"dupa", "dupa1"),clientSocket.getOutputStream());
         ByteArrayCrLfSerializer byteArrayCrLfSerializer = new ByteArrayCrLfSerializer();
 
         byte[] message = new byte[Short.MAX_VALUE];

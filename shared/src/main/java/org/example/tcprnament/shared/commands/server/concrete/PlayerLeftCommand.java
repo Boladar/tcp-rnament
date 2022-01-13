@@ -1,17 +1,15 @@
 package org.example.tcprnament.shared.commands.server.concrete;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.example.tcprnament.shared.commands.server.ServerCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommandType;
 
 @Getter
-@Setter
-public class GameJoinedCommand extends ServerCommand {
-    private String name;
+public class PlayerLeftCommand extends ServerCommand {
+    private String playerName;
 
-    public GameJoinedCommand(String name) {
-        super(ServerCommandType.GAME_JOINED);
-        this.name = name;
+    public PlayerLeftCommand(String playerName) {
+        super(ServerCommandType.PLAYER_LEFT);
+        this.playerName = playerName;
     }
 }

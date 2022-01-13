@@ -2,9 +2,7 @@ package org.example.tcprnament.shared.commands.server;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.tcprnament.shared.commands.Command;
-import org.example.tcprnament.shared.commands.server.concrete.GameCreatedCommand;
-import org.example.tcprnament.shared.commands.server.concrete.GameJoinedCommand;
-import org.example.tcprnament.shared.commands.server.concrete.GamesListCommand;
+import org.example.tcprnament.shared.commands.server.concrete.*;
 import org.example.tcprnament.shared.parser.CommandParser;
 
 @Slf4j
@@ -27,6 +25,15 @@ public abstract class ServerCommandParser extends CommandParser {
             case GAME_STARTED:
                 onGameStarted(serverCommand);
                 break;
+            case COMMAND_REJECTED:
+                onCommandRejected((CommandRejected) command);
+                break;
+            case PLAYER_JOINED:
+                onPlayerJoined((PlayerJoinedCommand) command);
+                break;
+            case PLAYER_LEFT:
+                onPlayerLeft((PlayerLeftCommand) command);
+                break;
         }
     }
 
@@ -37,5 +44,11 @@ public abstract class ServerCommandParser extends CommandParser {
     protected abstract void onGameJoined(GameJoinedCommand command);
 
     protected abstract void onGameStarted(ServerCommand command);
+
+    protected abstract void onCommandRejected(CommandRejected command);
+
+    protected abstract void onPlayerJoined(PlayerJoinedCommand command);
+
+    protected abstract void onPlayerLeft(PlayerLeftCommand command);
 
 }

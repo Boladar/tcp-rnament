@@ -9,9 +9,10 @@ import org.example.tcprnament.shared.commands.client.ClientCommandType;
 @Setter
 public class JoinGameCommand extends ClientCommand {
     private String name;
+    private String password;
 
-    public JoinGameCommand(String name) {
-        super(ClientCommandType.JOIN_GAME);
+    public JoinGameCommand(Long id,String name) {
+        super(id,ClientCommandType.JOIN_GAME);
         this.name = name;
     }
 }

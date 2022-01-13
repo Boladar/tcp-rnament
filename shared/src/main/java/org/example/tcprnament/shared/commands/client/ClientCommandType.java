@@ -4,5 +4,6 @@ public enum ClientCommandType {
     CREATE_GAME,
     SHOW_GAMES,
     JOIN_GAME,
+    LEAVE_GAME,
     START_GAME,
 }
