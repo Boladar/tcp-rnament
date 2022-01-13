@@ -14,7 +14,6 @@ import java.util.Vector;
 @Getter
 public class GUI {
     private Socket clientSocket;
-    private TournamentProtocolApplication tournamentProtocolApplication;
 
     private int commandIdCount;
 //////////////////////////
@@ -22,9 +21,21 @@ public class GUI {
     JFrame frame = new JFrame();
     JButton createGameButton = new JButton("Create Game");
     JPanel joinGamePanel = new JPanel();
+    JPanel createGamePanel = new JPanel();
+    JPanel quiz = new JPanel();
     JPanel panel2 = new JPanel();
-////////////////////////////////
+//////////////////////////////// joinGame
     JTable jTable = new JTable();
+    /////////////////// createGame
+    JLabel passwordLabel = new JLabel("Hasło:");
+    JTextField passwordText = new JTextField(10);
+    JButton submitPasswordButton = new JButton();
+    /////////////// quiz
+    JLabel roundLabel = new JLabel();
+    JLabel scoreLabel = new JLabel();
+    JLabel questionLabel = new JLabel();
+    JButton yesAns = new JButton();
+    JButton noAns = new JButton();
 
     public GUI() {
         //global
@@ -33,26 +44,26 @@ public class GUI {
         //joinGamePanel.setBorder(BorderFactory.createEmptyBorder(300, 300, 300, 300));
         joinGamePanel.setLayout(cardLayout);
         joinGamePanel.add(createGameButton);
-        joinGamePanel.add(jTable);
 
         joinGamePanel.add(panel2, "2");
         panel2.setBackground(Color.BLUE);
 
         cardLayout.show(joinGamePanel, "joinGame");
 
-
-
-
-
-
-
         //layout joinGame
-
+        joinGamePanel.add(jTable, "joinGame");
 
         //layout createGame
+        createGamePanel.add(passwordLabel, "createGame");
+        createGamePanel.add(passwordText, "createGame");
+        createGamePanel.add(submitPasswordButton, "createGame");
 
-
-        //layout game
+        //layout quiz
+        quiz.add(roundLabel, "quiz");
+        quiz.add(scoreLabel, "quiz");
+        quiz.add(questionLabel, "quiz");
+        quiz.add(yesAns, "quiz");
+        quiz.add(noAns, "quiz");
 
 
         createGameButton.addActionListener(new ActionListener() {
