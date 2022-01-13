@@ -34,8 +34,9 @@ public class ClientApplication {
     }
 
     public static void main(String[] args) throws Exception {
+        GUI gui = new GUI();
 
-        TournamentProtocolApplication tournamentProtocolApplication = new TournamentProtocolApplication();
+        TournamentProtocolApplication tournamentProtocolApplication = new TournamentProtocolApplication(gui);
         log.info("--------------------Starting client application-------------------------");
         log.info("test");
         log.error("error");

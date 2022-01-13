@@ -4,6 +4,10 @@ import org.example.tcprnament.shared.commands.server.ServerCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommandParser;
 import org.example.tcprnament.shared.commands.server.concrete.*;
 
+import java.io.Console;
+import java.util.Vector;
+
+@AllArgsConstructor
 public class TournamentProtocolApplication extends ServerCommandParser {
     @Override
     protected void onGameCreated(GameCreatedCommand command) {
