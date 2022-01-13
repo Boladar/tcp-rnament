@@ -1,11 +1,17 @@
 package com.example.server;
 
+import com.example.server.model.Game;
+import com.example.server.model.GameState;
+import com.example.server.model.Question;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.tcprnament.shared.commands.client.ClientCommand;
 import org.example.tcprnament.shared.commands.client.ClientCommandParser;
 import org.example.tcprnament.shared.commands.client.concrete.CreateGameCommand;
 import org.example.tcprnament.shared.commands.client.concrete.JoinGameCommand;
+import org.example.tcprnament.shared.commands.client.concrete.QuestionAnswerCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommandType;
 import org.example.tcprnament.shared.commands.server.concrete.*;
@@ -13,20 +19,28 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.integration.ip.tcp.connection.AbstractServerConnectionFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @DependsOn("gateway")
 @RequiredArgsConstructor
+@Getter
 public class TournamentProtocolServerApplication extends ClientCommandParser {
 
     private final AbstractServerConnectionFactory connectionFactory;
     private final Gateway gateway;
+    private final QuestionsProviderService questionsProviderService;
 
     private final Map<String, Game> currentGames = new ConcurrentHashMap<>();
     private final Map<String, String> gameOwnershipMap = new ConcurrentHashMap<>();
+    private final Map<String, Game> playerGameMap = new ConcurrentHashMap<>();
+
+    private final ThreadFactory gameThreadFactory = new ThreadFactoryBuilder().setNameFormat("Game-thread-%d").build();
+    private final ScheduledExecutorService gameExecutor = Executors.newScheduledThreadPool(10, gameThreadFactory);
 
     @Override
     protected void onCreateGame(CreateGameCommand command) {
@@ -36,6 +50,8 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
 
             currentGames.put(command.getName(), newGame);
             gameOwnershipMap.put(command.getConnectionId(), command.getName());
+            playerGameMap.put(command.getConnectionId(), newGame);
+
             log.info("Created game with name {}", command.getName());
             gateway.send(serialize(new GameCreatedCommand(command.getName())), command.getConnectionId());
         } else {
@@ -45,19 +61,32 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
 
     @Override
     protected void onShowGames(ClientCommand command) {
-        sendReject(command, "Not yet implemented");
+        List<String> gamesNames = currentGames.values().stream().map(Game::getName).collect(Collectors.toList());
+        gateway.send(serialize(new GamesListCommand(gamesNames)), command.getConnectionId());
     }
 
     @Override
     protected void onJoinGame(JoinGameCommand command) {
         if (currentGames.containsKey(command.getName())) {
             Game selectedGame = currentGames.get(command.getName());
-            if (!selectedGame.getPassword().equals(command.getPassword())) {
-                sendReject(command, "Wrong password");
-            }
+            if (selectedGame.getCurrentState() == GameState.LOBBY) {
 
-            currentGames.get(command.getName()).getPlayers().put(command.getConnectionId(), 0);
-            gateway.send(serialize(new GameJoinedCommand(command.getName())), command.getConnectionId());
+                if (!selectedGame.getPassword().equals(command.getPassword())) {
+                    sendReject(command, "Wrong password");
+                }
+
+                log.info("Player {}, joined game {}", command.getConnectionId(), selectedGame.getName());
+                currentGames.get(command.getName()).getPlayers().put(command.getConnectionId(), 0);
+                playerGameMap.put(command.getConnectionId(), selectedGame);
+
+                gateway.send(serialize(new GameJoinedCommand(command.getName())), command.getConnectionId());
+
+                selectedGame.getPlayers().forEach((player, score) -> {
+                    gateway.send(serialize(new PlayerJoinedCommand(command.getConnectionId())), player);
+                });
+            } else {
+                sendReject(command, "Game already started");
+            }
         } else {
             sendReject(command, "Cannot find game " + command.getName());
         }
@@ -67,9 +96,17 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
     protected void onStartGame(ClientCommand command) {
         if (gameOwnershipMap.containsKey(command.getConnectionId())) {
             String gameName = gameOwnershipMap.get(command.getConnectionId());
-            currentGames.get(gameName).getPlayers().forEach((player, score) -> {
+            Game requestedGame = currentGames.get(gameName);
+
+            requestedGame.getPlayers().forEach((player, score) -> {
                 gateway.send(serialize(new ServerCommand(ServerCommandType.GAME_STARTED)), command.getConnectionId());
             });
+
+            log.info("Starting game: {}", gameName);
+            requestedGame.setGameQuestions(questionsProviderService.pickNRandomQuestions(10));
+            GameDealer dealer = new GameDealer(this, requestedGame);
+            gameExecutor.execute(dealer);
+
         } else {
             sendReject(command, "User is not a game owner");
         }
@@ -80,6 +117,10 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
         for (Game g : currentGames.values()) {
             if (g.getPlayers().containsKey(command.getConnectionId())) {
                 g.removePlayer(command.getConnectionId());
+                playerGameMap.remove(command.getConnectionId());
+
+                log.info("Player : {}, left game : {}", command.getConnectionId(), g.getName());
+
                 g.getPlayers().forEach((player, score) -> {
                     gateway.send(serialize(new PlayerLeftCommand(command.getConnectionId())), player);
                 });
@@ -87,10 +128,49 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
             }
         }
 
-        sendReject(command,"Player not in game");
+        sendReject(command, "Player not in game");
+    }
+
+    @Override
+    protected void onQuestionAnswer(QuestionAnswerCommand command) {
+        if (playerGameMap.containsKey(command.getConnectionId())) {
+            Game playerGame = playerGameMap.get(command.getConnectionId());
+            Question question = playerGame.getGameQuestions().get(command.getQuestionNumber());
+
+            if (command.getAnswer() == question.getCorrectAnswer()) {
+                log.info(
+                        "[Game : {} player : {}] --> correct answer for question number: {}! +1 point",
+                        playerGame.getName(),
+                        command.getConnectionId(),
+                        command.getQuestionNumber()
+                );
+                Integer previous = playerGame.getPlayers().get(command.getConnectionId());
+                playerGame.getPlayers().put(command.getConnectionId(), previous + 1);
+
+            } else {
+                log.info(
+                        "[Game : {} player : {}] --> wrong answer for question number: {}! -2 points",
+                        playerGame.getName(),
+                        command.getConnectionId(),
+                        command.getQuestionNumber()
+                );
+                Integer previous = playerGame.getPlayers().get(command.getConnectionId());
+                playerGame.getPlayers().put(command.getConnectionId(), previous - 2);
+            }
+
+        } else {
+            sendReject(command, "Player not in any game");
+        }
     }
 
     private void sendReject(ClientCommand command, String reason) {
+        log.info(
+                "Sending reject to client {} -> [refId: {}, refType : {}, reason: {}]",
+                command.getConnectionId(),
+                command.getId(),
+                command.getType(),
+                reason
+        );
         gateway.send(serialize(new CommandRejected(command.getId(), command.getType(), reason)), command.getConnectionId());
     }
 }

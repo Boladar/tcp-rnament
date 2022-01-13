@@ -34,6 +34,12 @@ public abstract class ServerCommandParser extends CommandParser {
             case PLAYER_LEFT:
                 onPlayerLeft((PlayerLeftCommand) command);
                 break;
+            case GAME_SCORE_UPDATE:
+                onGameScoreUpdate((GameScoreUpdateCommand) command);
+                break;
+            case GAME_QUESTION:
+                onGameQuestion((GameQuestionCommand) command);
+                break;
         }
     }
 
@@ -50,5 +56,9 @@ public abstract class ServerCommandParser extends CommandParser {
     protected abstract void onPlayerJoined(PlayerJoinedCommand command);
 
     protected abstract void onPlayerLeft(PlayerLeftCommand command);
+
+    protected abstract void onGameScoreUpdate(GameScoreUpdateCommand command);
+
+    protected abstract void onGameQuestion(GameQuestionCommand command);
 
 }

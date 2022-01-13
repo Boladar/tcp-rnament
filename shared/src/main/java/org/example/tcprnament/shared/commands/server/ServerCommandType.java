@@ -7,5 +7,7 @@ public enum ServerCommandType {
     GAME_STARTED,
     COMMAND_REJECTED,
     PLAYER_JOINED,
-    PLAYER_LEFT
+    PLAYER_LEFT,
+    GAME_SCORE_UPDATE,
+    GAME_QUESTION
 }

@@ -3,6 +3,7 @@ package org.example.tcprnament.shared.commands.client;
 import lombok.extern.slf4j.Slf4j;
 import org.example.tcprnament.shared.commands.client.concrete.CreateGameCommand;
 import org.example.tcprnament.shared.commands.client.concrete.JoinGameCommand;
+import org.example.tcprnament.shared.commands.client.concrete.QuestionAnswerCommand;
 import org.example.tcprnament.shared.parser.CommandParser;
 
 @Slf4j
@@ -27,6 +28,9 @@ public abstract class ClientCommandParser extends CommandParser {
             case START_GAME:
                 onStartGame(clientCommand);
                 break;
+            case QUESTION_ANSWER:
+                onQuestionAnswer((QuestionAnswerCommand) clientCommand);
+                break;
         }
     }
 
@@ -39,4 +43,6 @@ public abstract class ClientCommandParser extends CommandParser {
     protected abstract void onStartGame(ClientCommand command);
 
     protected abstract void onLeaveGame(ClientCommand command);
+
+    protected abstract void onQuestionAnswer(QuestionAnswerCommand command);
 }
