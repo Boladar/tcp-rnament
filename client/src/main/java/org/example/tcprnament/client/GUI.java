@@ -39,7 +39,7 @@ public class GUI {
 
     public GUI() {
         //global
-
+        createGameButton.setBounds(1,1,50,50);
 
         //joinGamePanel.setBorder(BorderFactory.createEmptyBorder(300, 300, 300, 300));
         joinGamePanel.setLayout(cardLayout);
@@ -78,7 +78,8 @@ public class GUI {
         frame.add(joinGamePanel, BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("Prototype GUI");
-        frame.pack();
+        frame.setSize(500,500);
+        //    frame.pack();
         frame.setVisible(true);
 
 
