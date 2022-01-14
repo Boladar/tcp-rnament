@@ -1,18 +1,32 @@
 package org.example.tcprnament.client;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.example.tcprnament.shared.commands.server.ServerCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommandParser;
 import org.example.tcprnament.shared.commands.server.concrete.*;
 
-@AllArgsConstructor
-public class TournamentProtocolApplication extends ServerCommandParser {
+import java.net.Socket;
 
-    private final GUI gui;
+@Slf4j
+@Getter
+@Setter
+public class TournamentProtocolApplication extends ServerCommandParser {
+    private Socket clientSocket;
+    private NewGUI gui;
+
+    public TournamentProtocolApplication(Socket clientSocket, NewGUI gui){
+        this.clientSocket = clientSocket;
+        this.gui = gui;
+    }
+
+
 
     @Override
     protected void onGameCreated(GameCreatedCommand command) {
-
+        System.out.println("!GÓWNO OŻYŁO!");
     }
 
     @Override
@@ -32,7 +46,7 @@ public class TournamentProtocolApplication extends ServerCommandParser {
 
     @Override
     protected void onCommandRejected(CommandRejected command) {
-
+        log.info("Brawo cos zjebales! " + command.getReason());
     }
 
     @Override

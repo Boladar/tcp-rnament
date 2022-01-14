@@ -34,21 +34,26 @@ public class ClientApplication {
     }
 
     public static void main(String[] args) throws Exception {
-        GUI gui = new GUI();
-
-        TournamentProtocolApplication tournamentProtocolApplication = new TournamentProtocolApplication(gui);
         log.info("--------------------Starting client application-------------------------");
         log.info("test");
         log.error("error");
 
         ClientApplication client = new ClientApplication();
-        tournamentProtocolApplication.write(new CreateGameCommand(1L,"dupa", "dupa1"),clientSocket.getOutputStream());
-        ByteArrayCrLfSerializer byteArrayCrLfSerializer = new ByteArrayCrLfSerializer();
 
-        byte[] message = new byte[Short.MAX_VALUE];
-        byteArrayCrLfSerializer.doDeserialize(clientSocket.getInputStream(),message);
-        tournamentProtocolApplication.parse(message, null);
-        clientSocket.close();
+
+        NewGUI gui = new NewGUI(clientSocket);
+        TournamentProtocolApplication tournamentProtocolApplication = new TournamentProtocolApplication(clientSocket, gui);
+        Thread receiverThread = new Thread(new Receiver(clientSocket, tournamentProtocolApplication));
+        receiverThread.start();
+
+
+//        tournamentProtocolApplication.write(new CreateGameCommand(1L,"dupa", "dupa1"),clientSocket.getOutputStream());
+//        ByteArrayCrLfSerializer byteArrayCrLfSerializer = new ByteArrayCrLfSerializer();
+//
+//        byte[] message = new byte[Short.MAX_VALUE];
+//        byteArrayCrLfSerializer.doDeserialize(clientSocket.getInputStream(),message);
+//        tournamentProtocolApplication.parse(message, null);
+//        clientSocket.close();
     }
 
 }

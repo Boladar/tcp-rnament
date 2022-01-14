@@ -1,11 +1,26 @@
 package org.example.tcprnament.client;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.Socket;
 
+@Slf4j
+@Getter
+@Setter
 public class NewGUI {
+
+    private final Socket clientSocket;
+    private final TournamentProtocolApplication tournamentProtocolApplication;
+    private Sender sender;
+
+
 
     JFrame frame = new JFrame();
     JPanel panelCont = new JPanel();
@@ -20,7 +35,11 @@ public class NewGUI {
     JLabel passwordLabel = new JLabel("Password:");
 
 
-    public NewGUI() {
+    public NewGUI(Socket clientSocket) {
+        this.clientSocket = clientSocket;
+        this.tournamentProtocolApplication = new TournamentProtocolApplication(clientSocket, this);
+        this.sender = new Sender(clientSocket, tournamentProtocolApplication);
+
         panelCont.setLayout(cl);
 
         //menuPanel
@@ -63,9 +82,7 @@ public class NewGUI {
                 gameName.setText("");
                 gamePassword.setText("");
 
-                ///teraz to przsłać trzeba
-                System.out.println(name);
-                System.out.println(password);
+                sendCreateGame(name, password);
 
                 cl.show(panelCont,"menu");
             }
@@ -79,12 +96,19 @@ public class NewGUI {
         //frame.setSize(500, 500);
         frame.pack();
         frame.setVisible(true);
-
     }
 
-    public static void main(String[] args) {
-        new NewGUI();
+//    public static void main(String[] args, Socket clientSocket, TournamentProtocolApplication tournamentProtocolApplication) {
+//        new NewGUI(clientSocket, tournamentProtocolApplication);
+//
+//    }
 
+    private void sendCreateGame(String name, String pass){
+        try {
+            this.sender.sendCreateGame(name, pass);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
