@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Getter
@@ -111,4 +113,35 @@ public class NewGUI {
         }
     }
 
+    public void rejectedInfoMessage(String reason) {
+        //wyswietlic (moze zawsze na gorze ekranu) odrzucono komende z jakiegos powodu?
+    }
+
+    public void gameListReceived(List<String> games) {
+        //wyswietlic otrzymaną liste gier w przystępnej formie z mozliwoscia dołaczenia do gry ( po wpisaniu hasla)
+    }
+
+    public void gameJoined() {
+        // zmienic gui na to z gry + (info o dołączeniu do gry?)
+    }
+
+    public void addPlayer(String playerName) {
+        //add new player to players list?
+    }
+
+    public void removePlayer(String playerName) {
+        //remove player from player list
+    }
+
+    public void gameFinished() {
+        //gameEnding screen
+    }
+
+    public void updateScoreBoard(Map<String, Integer> scoreboard) {
+        //updateScoreBoadrd
+    }
+
+    public void newQuestion(int questionNumber, String text) {
+        //newQuestion arrived
+    }
 }
