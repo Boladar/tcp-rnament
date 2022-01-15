@@ -33,7 +33,7 @@ public class ClientApplication {
         return in.readLine();
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException {
         log.info("--------------------Starting client application-------------------------");
         log.info("test");
         log.error("error");
