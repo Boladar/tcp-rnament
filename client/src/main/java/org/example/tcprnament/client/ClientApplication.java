@@ -33,7 +33,7 @@ public class ClientApplication {
         return in.readLine();
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args){
         log.info("--------------------Starting client application-------------------------");
         log.info("test");
         log.error("error");
@@ -42,8 +42,7 @@ public class ClientApplication {
 
 
         NewGUI gui = new NewGUI(clientSocket);
-        TournamentProtocolApplication tournamentProtocolApplication = new TournamentProtocolApplication(clientSocket, gui);
-        Thread receiverThread = new Thread(new Receiver(clientSocket, tournamentProtocolApplication));
+        Thread receiverThread = new Thread(new Receiver(clientSocket, gui.getTournamentProtocolApplication()));
         receiverThread.start();
 
 
