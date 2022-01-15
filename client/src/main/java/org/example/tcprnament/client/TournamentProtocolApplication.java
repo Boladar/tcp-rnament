@@ -9,6 +9,7 @@ import org.example.tcprnament.shared.commands.server.ServerCommandParser;
 import org.example.tcprnament.shared.commands.server.concrete.*;
 
 import java.net.Socket;
+import java.util.Vector;
 
 @Slf4j
 @Getter
@@ -33,7 +34,10 @@ public class TournamentProtocolApplication extends ServerCommandParser {
     @Override
     protected void onGamesList(GamesListCommand command) {
         log.info("Received " + command.getGames().size() + " games list.");
-        gui.gameListReceived(command.getGames());
+        Vector<String> games = new Vector<String>(command.getGames());
+        Vector<String> column = new Vector<String>();
+        column.add("Aktywne gry");
+//        gui.gameListReceived(command.getGames(games, column));
     }
 
     @Override
@@ -72,12 +76,19 @@ public class TournamentProtocolApplication extends ServerCommandParser {
             log.info("Game ended");
             gui.gameFinished();
         }
-        gui.updateScoreBoard(command.getScoreboard());
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("Aktualne wyniki: ");
+        for(String player : command.getScoreboard().keySet()){
+            builder.append(player  + ": " + command.getScoreboard().get(player) + " ");
+        }
+
+        gui.updateScoreBoard(builder.toString());
     }
 
     @Override
     protected void onGameQuestion(GameQuestionCommand command) {
         log.info("New question: " + command.getQuestionNumber() + ". " + command.getText());
-        gui.newQuestion(command.getQuestionNumber(), command.getText());
+        gui.newQuestion(command.getQuestionNumber() + command.getText());
     }
 }

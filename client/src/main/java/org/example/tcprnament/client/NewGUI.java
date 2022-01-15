@@ -10,8 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 @Slf4j
 @Getter
@@ -36,6 +38,12 @@ public class NewGUI {
     JLabel nameLabel = new JLabel("Game name:");
     JLabel passwordLabel = new JLabel("Password:");
 
+    JTable activeGames = new JTable();
+
+    JLabel scoreBoard = new JLabel();
+    JLabel question = new JLabel();
+
+    List<String> activePlayers = new ArrayList<>();
 
     public NewGUI(Socket clientSocket) {
         this.clientSocket = clientSocket;
@@ -117,8 +125,9 @@ public class NewGUI {
         //wyswietlic (moze zawsze na gorze ekranu) odrzucono komende z jakiegos powodu?
     }
 
-    public void gameListReceived(List<String> games) {
+    public void gameListReceived(Vector data,Vector column) {
         //wyswietlic otrzymaną liste gier w przystępnej formie z mozliwoscia dołaczenia do gry ( po wpisaniu hasla)
+//        this.activePlayers = new JTable(data, column);
     }
 
     public void gameJoined() {
@@ -126,22 +135,22 @@ public class NewGUI {
     }
 
     public void addPlayer(String playerName) {
-        //add new player to players list?
+        this.activePlayers.add(playerName);
     }
 
     public void removePlayer(String playerName) {
-        //remove player from player list
+        this.activePlayers.remove(playerName);
     }
 
     public void gameFinished() {
         //gameEnding screen
     }
 
-    public void updateScoreBoard(Map<String, Integer> scoreboard) {
-        //updateScoreBoadrd
+    public void updateScoreBoard(String scoreboard) {
+        this.scoreBoard.setText(scoreboard);
     }
 
-    public void newQuestion(int questionNumber, String text) {
-        //newQuestion arrived
+    public void newQuestion(String question) {
+        this.question.setText(question);
     }
 }
