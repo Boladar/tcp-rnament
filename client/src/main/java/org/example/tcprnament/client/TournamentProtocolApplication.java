@@ -49,6 +49,7 @@ public class TournamentProtocolApplication extends ServerCommandParser {
     @Override
     protected void onGameStarted(ServerCommand command) {
         log.info("Game started.");
+        gui.gameStarted();
     }
 
     @Override

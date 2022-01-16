@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,7 +15,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 @Slf4j
 @Getter
@@ -24,31 +25,44 @@ public class NewGUI {
     private final TournamentProtocolApplication tournamentProtocolApplication;
     private Sender sender;
 
+    private String joinGameName = "";
 
     JFrame frame = new JFrame();
     JPanel panelCont = new JPanel();
     JPanel menuPanel = new JPanel();
     JPanel createGamePanel = new JPanel();
+    JPanel loginPanel = new JPanel();
+    JPanel gamePanel = new JPanel();
+    JPanel waitingRoom = new JPanel();
+
     JButton createGameButton = new JButton("Create Game");
     JButton submitButton = new JButton("Submit");
     JButton refreshGamesButton = new JButton("Refresh");
+    JButton joinGameButton = new JButton("Join");
+    JButton yesButton = new JButton("Yes");
+    JButton noButton = new JButton("No");
+    JButton startGameButton = new JButton("Start Game");
+
     CardLayout cl = new CardLayout();
+
     JTextField gameName = new JTextField();
     JTextField gamePassword = new JTextField();
+    JTextField loginPasswordField = new JTextField();
+
     JLabel nameLabel = new JLabel("Game name:");
     JLabel passwordLabel = new JLabel("Password:");
+    JLabel loginPasswordLabel = new JLabel("Password:");
+    JLabel scoreBoard = new JLabel();
+    JLabel question = new JLabel();
+    JLabel activePlayers = new JLabel();
 
 
     DefaultTableModel model = new DefaultTableModel();
     JTable activeGames = new JTable(model);
 
+    List<String> activePlayersList = new ArrayList<>();
 
-    JLabel scoreBoard = new JLabel();
-    JLabel question = new JLabel();
-
-    List<String> activePlayers = new ArrayList<>();
-
-    public NewGUI(Socket clientSocket){
+    public NewGUI(Socket clientSocket) {
         this.clientSocket = clientSocket;
         this.tournamentProtocolApplication = new TournamentProtocolApplication(clientSocket, this);
         this.sender = new Sender(clientSocket, tournamentProtocolApplication);
@@ -75,16 +89,42 @@ public class NewGUI {
 
         createGamePanel.add(submitButton);
 
+        //LoginPanel
+        loginPanel.add(loginPasswordLabel);
+        loginPasswordField.setPreferredSize(new Dimension(250, 40));
+        loginPanel.add(loginPasswordField);
+        loginPanel.add(joinGameButton);
+
+        //WaitingRoom
+        waitingRoom.add(activePlayers);
+        waitingRoom.add(startGameButton);
+
+        //GamePanel
+        gamePanel.add(question);
+        gamePanel.add(yesButton);
+        gamePanel.add(noButton);
+        gamePanel.add(scoreBoard);
+
         //panelContainer
         panelCont.add(menuPanel, "menu");
         panelCont.add(createGamePanel, "createGame");
+        panelCont.add(loginPanel, "loginPanel");
+        panelCont.add(gamePanel, "gamePanel");
+        panelCont.add(waitingRoom, "waitingRoom");
         cl.show(panelCont, "menu");
 
+
+        joinGameButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendJoinGame(loginPasswordField.getText());
+            }
+        });
 
         refreshGamesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            UpdateGameTable();
+                UpdateGameTable();
             }
         });
 
@@ -106,7 +146,17 @@ public class NewGUI {
 
                 sendCreateGame(name, password);
 
-                cl.show(panelCont, "menu");
+                joinGameName = name;
+                sendJoinGame(password);
+
+            }
+        });
+
+        activeGames.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                joinGameName = activeGames.getValueAt(activeGames.getSelectedRow(), 0).toString();
+                cl.show(panelCont, "loginPanel");
             }
         });
 
@@ -121,7 +171,8 @@ public class NewGUI {
 
         UpdateGameTable();
     }
-    private void UpdateGameTable()  {
+
+    private void UpdateGameTable() {
         try {
             this.sender.getGameList();
         } catch (IOException e) {
@@ -143,6 +194,14 @@ public class NewGUI {
         }
     }
 
+    private void sendJoinGame(String pass){
+        try {
+            this.sender.sendJoinGame(joinGameName,pass);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void rejectedInfoMessage(String reason) {
         //wyswietlic (moze zawsze na gorze ekranu) odrzucono komende z jakiegos powodu?
     }
@@ -150,23 +209,23 @@ public class NewGUI {
     public void gameListReceived(List<String> data) {
         //wyswietlic otrzymaną liste gier w przystępnej formie z mozliwoscia dołaczenia do gry ( po wpisaniu hasla)
 //        this.activePlayers = new JTable(data, column);
-        log.info("revcived games: "+data);
+        log.info("revcived games: " + data);
         model.setRowCount(0);
         data.forEach(r -> model.addRow(new Object[]{r}));
 
-        cl.show(panelCont, "menu");
     }
 
     public void gameJoined() {
         // zmienic gui na to z gry + (info o dołączeniu do gry?)
+        cl.show(panelCont,"waitingRoom");
     }
 
     public void addPlayer(String playerName) {
-        this.activePlayers.add(playerName);
+        this.activePlayersList.add(playerName);
     }
 
     public void removePlayer(String playerName) {
-        this.activePlayers.remove(playerName);
+        this.activePlayersList.remove(playerName);
     }
 
     public void gameFinished() {
@@ -179,5 +238,9 @@ public class NewGUI {
 
     public void newQuestion(String question) {
         this.question.setText(question);
+    }
+
+    public void gameStarted() {
+        cl.show(panelCont, "gamePanel");
     }
 }

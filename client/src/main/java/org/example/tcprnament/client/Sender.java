@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.tcprnament.shared.commands.client.ClientCommand;
 import org.example.tcprnament.shared.commands.client.ClientCommandType;
 import org.example.tcprnament.shared.commands.client.concrete.CreateGameCommand;
+import org.example.tcprnament.shared.commands.client.concrete.JoinGameCommand;
 import org.springframework.integration.ip.tcp.serializer.ByteArrayCrLfSerializer;
 
 import java.io.IOException;
@@ -36,6 +37,12 @@ public class Sender {
     public void getGameList() throws IOException {
         log.info("Sending gameList request");
         tournamentProtocolApplication.write(new ClientCommand(commandCounter, ClientCommandType.SHOW_GAMES), clientSocket.getOutputStream());
+        commandCounter++;
+    }
+
+    public void sendJoinGame(String joinGameName, String pass) throws IOException {
+        log.info("Sending join game request");
+        tournamentProtocolApplication.write(new JoinGameCommand(commandCounter,joinGameName, pass), clientSocket.getOutputStream());
         commandCounter++;
     }
 }

@@ -15,4 +15,10 @@ public class JoinGameCommand extends ClientCommand {
         super(id,ClientCommandType.JOIN_GAME);
         this.name = name;
     }
+
+    public JoinGameCommand(Long id, String name, String password) {
+        super(id, ClientCommandType.JOIN_GAME);
+        this.name = name;
+        this.password = password;
+    }
 }
