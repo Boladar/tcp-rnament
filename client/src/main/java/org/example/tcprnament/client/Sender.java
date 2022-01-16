@@ -8,6 +8,7 @@ import org.example.tcprnament.shared.commands.client.ClientCommand;
 import org.example.tcprnament.shared.commands.client.ClientCommandType;
 import org.example.tcprnament.shared.commands.client.concrete.CreateGameCommand;
 import org.example.tcprnament.shared.commands.client.concrete.JoinGameCommand;
+import org.example.tcprnament.shared.commands.client.concrete.QuestionAnswerCommand;
 import org.springframework.integration.ip.tcp.serializer.ByteArrayCrLfSerializer;
 
 import java.io.IOException;
@@ -44,5 +45,16 @@ public class Sender {
         log.info("Sending join game request");
         tournamentProtocolApplication.write(new JoinGameCommand(commandCounter,joinGameName, pass), clientSocket.getOutputStream());
         commandCounter++;
+    }
+
+    public void sendGameStarted() throws IOException {
+        log.info("Sending start game request");
+        tournamentProtocolApplication.write(new ClientCommand(commandCounter, ClientCommandType.START_GAME), clientSocket.getOutputStream() );
+        commandCounter++;
+    }
+
+    public void sendAnswer(int questionNumber, boolean ans) throws IOException {
+        log.info("Sending answer for question {}: {}", questionNumber,ans);
+        tournamentProtocolApplication.write(new QuestionAnswerCommand(commandCounter, questionNumber, ans), clientSocket.getOutputStream());
     }
 }
