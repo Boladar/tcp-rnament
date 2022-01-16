@@ -38,10 +38,9 @@ public class GameDealer implements Runnable {
 
         if (!finished) {
             log.info("[Update Game: {}] --> dealing question number: {}", game.getName(), game.getCurrentQuestion());
-            game.setCurrentQuestion(game.getCurrentQuestion() + 1);
 
             GameQuestionCommand gameQuestionCommand = new GameQuestionCommand(
-                    game.getCurrentQuestion(),
+                    game.getCurrentQuestion() + 1,
                     game.getGameQuestions()
                         .get(game.getCurrentQuestion())
                         .getText()
@@ -51,8 +50,9 @@ public class GameDealer implements Runnable {
                 gateway.send(application.serialize(gameQuestionCommand), player);
             });
 
+            game.setCurrentQuestion(game.getCurrentQuestion()+1);
             gameExecutor.schedule(this, 5, TimeUnit.SECONDS);
-        } else {
+        } else{
             log.info("Game: {}, reached final question ending the game!", game.getName());
         }
 
