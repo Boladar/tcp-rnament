@@ -99,7 +99,7 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
             Game requestedGame = currentGames.get(gameName);
 
             requestedGame.getPlayers().forEach((player, score) -> {
-                gateway.send(serialize(new ServerCommand(ServerCommandType.GAME_STARTED)), command.getConnectionId());
+                gateway.send(serialize(new ServerCommand(ServerCommandType.GAME_STARTED)), player);
             });
 
             log.info("Starting game: {}", gameName);
