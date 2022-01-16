@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -26,6 +28,8 @@ public class NewGUI {
     private Sender sender;
 
     private String joinGameName = "";
+    private boolean gameOwner = false;
+    private int questionNumber;
 
     JFrame frame = new JFrame();
     JPanel panelCont = new JPanel();
@@ -149,6 +153,7 @@ public class NewGUI {
                 joinGameName = name;
                 sendJoinGame(password);
 
+                gameOwner = true;
             }
         });
 
@@ -157,6 +162,27 @@ public class NewGUI {
             public void valueChanged(ListSelectionEvent e) {
                 joinGameName = activeGames.getValueAt(activeGames.getSelectedRow(), 0).toString();
                 cl.show(panelCont, "loginPanel");
+            }
+        });
+
+        startGameButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendGameStart();
+            }
+        });
+
+        yesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendAns(true);
+            }
+        });
+
+        noButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendAns(false);
             }
         });
 
@@ -172,6 +198,8 @@ public class NewGUI {
         UpdateGameTable();
     }
 
+
+
     private void UpdateGameTable() {
         try {
             this.sender.getGameList();
@@ -179,12 +207,6 @@ public class NewGUI {
             e.printStackTrace();
         }
     }
-
-
-//    public static void main(String[] args, Socket clientSocket, TournamentProtocolApplication tournamentProtocolApplication) {
-//        new NewGUI(clientSocket, tournamentProtocolApplication);
-//
-//    }
 
     private void sendCreateGame(String name, String pass) {
         try {
@@ -202,17 +224,30 @@ public class NewGUI {
         }
     }
 
+    private void sendGameStart(){
+        try {
+            this.sender.sendGameStarted();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendAns(boolean ans){
+        try {
+            this.sender.sendAnswer(questionNumber, ans);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void rejectedInfoMessage(String reason) {
         //wyswietlic (moze zawsze na gorze ekranu) odrzucono komende z jakiegos powodu?
     }
 
     public void gameListReceived(List<String> data) {
-        //wyswietlic otrzymaną liste gier w przystępnej formie z mozliwoscia dołaczenia do gry ( po wpisaniu hasla)
-//        this.activePlayers = new JTable(data, column);
         log.info("revcived games: " + data);
         model.setRowCount(0);
         data.forEach(r -> model.addRow(new Object[]{r}));
-
     }
 
     public void gameJoined() {
