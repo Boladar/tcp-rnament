@@ -135,9 +135,9 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
     protected void onQuestionAnswer(QuestionAnswerCommand command) {
         if (playerGameMap.containsKey(command.getConnectionId())) {
             Game playerGame = playerGameMap.get(command.getConnectionId());
-            Question question = playerGame.getGameQuestions().get(command.getQuestionNumber());
+            Question question = playerGame.getGameQuestions().get(command.getQuestionNumber()-1);
 
-            if (command.getAnswer() == question.getCorrectAnswer()) {
+            if (command.getAnswer().equals(question.getCorrectAnswer())) {
                 log.info(
                         "[Game : {} player : {}] --> correct answer for question number: {}! +1 point",
                         playerGame.getName(),
