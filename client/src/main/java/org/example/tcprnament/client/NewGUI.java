@@ -38,9 +38,6 @@ public class NewGUI {
     JLabel nameLabel = new JLabel("Game name:");
     JLabel passwordLabel = new JLabel("Password:");
 
-//
-    Vector data = new Vector<>();
-//  Vector column = new Vector<>();
 
     DefaultTableModel model = new DefaultTableModel();
     JTable activeGames = new JTable(model);
@@ -51,7 +48,7 @@ public class NewGUI {
 
     List<String> activePlayers = new ArrayList<>();
 
-    public NewGUI(Socket clientSocket) throws IOException {
+    public NewGUI(Socket clientSocket){
         this.clientSocket = clientSocket;
         this.tournamentProtocolApplication = new TournamentProtocolApplication(clientSocket, this);
         this.sender = new Sender(clientSocket, tournamentProtocolApplication);
@@ -150,13 +147,12 @@ public class NewGUI {
         //wyswietlic (moze zawsze na gorze ekranu) odrzucono komende z jakiegos powodu?
     }
 
-    public void gameListReceived(Vector data, Vector columns) {
+    public void gameListReceived(List<String> data) {
         //wyswietlic otrzymaną liste gier w przystępnej formie z mozliwoscia dołaczenia do gry ( po wpisaniu hasla)
 //        this.activePlayers = new JTable(data, column);
-        log.info("revcived game vector: "+data);
+        log.info("revcived games: "+data);
         model.setRowCount(0);
-//        data.forEach(r ->{model.addRow(new Object[]r)})
-        model.setRowCount(data.size());
+        data.forEach(r -> model.addRow(new Object[]{r}));
 
         cl.show(panelCont, "menu");
     }

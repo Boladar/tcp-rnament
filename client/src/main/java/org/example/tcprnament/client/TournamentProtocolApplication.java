@@ -34,10 +34,10 @@ public class TournamentProtocolApplication extends ServerCommandParser {
     @Override
     protected void onGamesList(GamesListCommand command) {
         log.info("Received " + command.getGames().size() + " games list.");
-        Vector<Vector<String>> games = new Vector(command.getGames());
-        Vector column = new Vector();
-        column.add("Aktywne gry");
-        gui.gameListReceived(games, column);
+//        Vector<Vector<String>> games = new Vector(command.getGames());
+//        Vector column = new Vector();
+//        column.add("Aktywne gry");
+        gui.gameListReceived(command.getGames());
     }
 
     @Override
