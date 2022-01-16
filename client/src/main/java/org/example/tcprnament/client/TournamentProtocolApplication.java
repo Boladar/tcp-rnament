@@ -72,7 +72,7 @@ public class TournamentProtocolApplication extends ServerCommandParser {
 
     @Override
     protected void onGameScoreUpdate(GameScoreUpdateCommand command) {
-        log.info("Received new gameScore: " + command.getScoreboard());
+        log.info("Received new gameScore: {}", command.getScoreboard());
         if(command.isFinished()){
             log.info("Game ended");
             gui.gameFinished();
@@ -90,6 +90,7 @@ public class TournamentProtocolApplication extends ServerCommandParser {
     @Override
     protected void onGameQuestion(GameQuestionCommand command) {
         log.info("New question: " + command.getQuestionNumber() + ". " + command.getText());
-        gui.newQuestion(command.getQuestionNumber() + command.getText());
+        gui.setQuestionNumber(command.getQuestionNumber());
+        gui.newQuestion(command.getQuestionNumber() + ". " + command.getText());
     }
 }
