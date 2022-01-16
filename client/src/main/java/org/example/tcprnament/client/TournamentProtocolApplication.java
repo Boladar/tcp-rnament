@@ -73,10 +73,6 @@ public class TournamentProtocolApplication extends ServerCommandParser {
     @Override
     protected void onGameScoreUpdate(GameScoreUpdateCommand command) {
         log.info("Received new gameScore: {}", command.getScoreboard());
-        if(command.isFinished()){
-            log.info("Game ended");
-            gui.gameFinished();
-        }
 
         StringBuilder builder = new StringBuilder();
         builder.append("Aktualne wyniki: ");
@@ -84,7 +80,12 @@ public class TournamentProtocolApplication extends ServerCommandParser {
             builder.append(player  + ": " + command.getScoreboard().get(player) + " ");
         }
 
-        gui.updateScoreBoard(builder.toString());
+        if(command.isFinished()){
+            log.info("Game ended");
+            gui.gameFinished(builder.toString());
+        }else{
+            gui.updateScoreBoard(builder.toString());
+        }
     }
 
     @Override

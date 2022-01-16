@@ -38,6 +38,7 @@ public class NewGUI {
     JPanel loginPanel = new JPanel();
     JPanel gamePanel = new JPanel();
     JPanel waitingRoom = new JPanel();
+    JPanel gameOver = new JPanel();
 
     JButton createGameButton = new JButton("Create Game");
     JButton submitButton = new JButton("Submit");
@@ -46,6 +47,7 @@ public class NewGUI {
     JButton yesButton = new JButton("Yes");
     JButton noButton = new JButton("No");
     JButton startGameButton = new JButton("Start Game");
+    JButton goBackMenu = new JButton();
 
     CardLayout cl = new CardLayout();
 
@@ -59,6 +61,7 @@ public class NewGUI {
     JLabel scoreBoard = new JLabel();
     JLabel question = new JLabel();
     JLabel activePlayers = new JLabel();
+    JLabel gameOverLabel = new JLabel();
 
 
     DefaultTableModel model = new DefaultTableModel();
@@ -109,12 +112,17 @@ public class NewGUI {
         gamePanel.add(noButton);
         gamePanel.add(scoreBoard);
 
+        //gameOver
+        gameOver.add(gameOverLabel);
+        gameOver.add(goBackMenu);
+
         //panelContainer
         panelCont.add(menuPanel, "menu");
         panelCont.add(createGamePanel, "createGame");
         panelCont.add(loginPanel, "loginPanel");
         panelCont.add(gamePanel, "gamePanel");
         panelCont.add(waitingRoom, "waitingRoom");
+        panelCont.add(gameOver, "gameOver");
         cl.show(panelCont, "menu");
 
 
@@ -183,6 +191,13 @@ public class NewGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendAns(false);
+            }
+        });
+
+        goBackMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cl.show(panelCont, "menu");
             }
         });
 
@@ -263,8 +278,9 @@ public class NewGUI {
         this.activePlayersList.remove(playerName);
     }
 
-    public void gameFinished() {
-        //gameEnding screen
+    public void gameFinished(String finalScore) {
+        this.gameOverLabel.setText(finalScore);
+        cl.show(panelCont, "gameOver");
     }
 
     public void updateScoreBoard(String scoreboard) {
