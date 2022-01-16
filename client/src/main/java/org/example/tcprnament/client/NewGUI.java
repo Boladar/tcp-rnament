@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,10 +38,13 @@ public class NewGUI {
     JLabel nameLabel = new JLabel("Game name:");
     JLabel passwordLabel = new JLabel("Password:");
 
-
+//
     Vector data = new Vector<>();
-    Vector column = new Vector<>();
-    JTable activeGames = new JTable(data,column);
+//  Vector column = new Vector<>();
+
+    DefaultTableModel model = new DefaultTableModel();
+    JTable activeGames = new JTable(model);
+
 
     JLabel scoreBoard = new JLabel();
     JLabel question = new JLabel();
@@ -58,6 +62,8 @@ public class NewGUI {
         menuPanel.add(createGameButton);
         menuPanel.add(refreshGamesButton);
         menuPanel.setBackground(Color.BLUE);
+        model.addColumn("Name");
+
         menuPanel.add(activeGames);
 
         //createGamePanel
@@ -144,11 +150,14 @@ public class NewGUI {
         //wyswietlic (moze zawsze na gorze ekranu) odrzucono komende z jakiegos powodu?
     }
 
-    public void gameListReceived(Vector data, Vector column) {
+    public void gameListReceived(Vector data, Vector columns) {
         //wyswietlic otrzymaną liste gier w przystępnej formie z mozliwoscia dołaczenia do gry ( po wpisaniu hasla)
 //        this.activePlayers = new JTable(data, column);
         log.info("revcived game vector: "+data);
-        activeGames = new JTable(data, column);
+        model.setRowCount(0);
+//        data.forEach(r ->{model.addRow(new Object[]r)})
+        model.setRowCount(data.size());
+
         cl.show(panelCont, "menu");
     }
 
