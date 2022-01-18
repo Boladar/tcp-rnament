@@ -57,4 +57,9 @@ public class Sender {
         log.info("Sending answer for question {}: {}", questionNumber,ans);
         tournamentProtocolApplication.write(new QuestionAnswerCommand(commandCounter, questionNumber, ans), clientSocket.getOutputStream());
     }
+
+    public void setNick(String nick) {
+        log.info("Setting players nick to: "+nick);
+        //tournamentProtocolApplication.write(new
+    }
 }

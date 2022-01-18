@@ -5,8 +5,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -39,6 +37,7 @@ public class NewGUI {
     JPanel gamePanel = new JPanel();
     JPanel waitingRoom = new JPanel();
     JPanel gameOver = new JPanel();
+    JPanel setNickPanel = new JPanel();
 
     JButton createGameButton = new JButton("Create Game");
     JButton submitButton = new JButton("Submit");
@@ -48,12 +47,14 @@ public class NewGUI {
     JButton noButton = new JButton("No");
     JButton startGameButton = new JButton("Start Game");
     JButton goBackMenu = new JButton();
+    JButton sendNickButton = new JButton("Set Nick");
 
     CardLayout cl = new CardLayout();
 
     JTextField gameName = new JTextField();
     JTextField gamePassword = new JTextField();
     JTextField loginPasswordField = new JTextField();
+    JTextField nickSetField = new JTextField();
 
     JLabel nameLabel = new JLabel("Game name:");
     JLabel passwordLabel = new JLabel("Password:");
@@ -75,6 +76,11 @@ public class NewGUI {
         this.sender = new Sender(clientSocket, tournamentProtocolApplication);
 
         panelCont.setLayout(cl);
+
+        //NickSetPanel
+        nickSetField.setPreferredSize(new Dimension(250, 40));
+        setNickPanel.add(nickSetField);
+        setNickPanel.add(sendNickButton);
 
         //menuPanel
         menuPanel.add(createGameButton);
@@ -117,14 +123,22 @@ public class NewGUI {
         gameOver.add(goBackMenu);
 
         //panelContainer
+        panelCont.add(setNickPanel, "setNickPanel");
         panelCont.add(menuPanel, "menu");
         panelCont.add(createGamePanel, "createGame");
         panelCont.add(loginPanel, "loginPanel");
         panelCont.add(gamePanel, "gamePanel");
         panelCont.add(waitingRoom, "waitingRoom");
         panelCont.add(gameOver, "gameOver");
-        cl.show(panelCont, "menu");
+        cl.show(panelCont, "setNickPanel");
 
+
+        sendNickButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendNick(nickSetField.getText());
+            }
+        });
 
         joinGameButton.addActionListener(new ActionListener() {
             @Override
@@ -214,13 +228,16 @@ public class NewGUI {
     }
 
 
-
     private void UpdateGameTable() {
         try {
             this.sender.getGameList();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendNick(){
+        this.sender.setNick();
     }
 
     private void sendCreateGame(String name, String pass) {
@@ -231,15 +248,15 @@ public class NewGUI {
         }
     }
 
-    private void sendJoinGame(String pass){
+    private void sendJoinGame(String pass) {
         try {
-            this.sender.sendJoinGame(joinGameName,pass);
+            this.sender.sendJoinGame(joinGameName, pass);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void sendGameStart(){
+    private void sendGameStart() {
         try {
             this.sender.sendGameStarted();
         } catch (IOException e) {
@@ -247,7 +264,7 @@ public class NewGUI {
         }
     }
 
-    private void sendAns(boolean ans){
+    private void sendAns(boolean ans) {
         try {
             this.sender.sendAnswer(questionNumber, ans);
         } catch (IOException e) {
@@ -267,7 +284,7 @@ public class NewGUI {
 
     public void gameJoined() {
         // zmienic gui na to z gry + (info o dołączeniu do gry?)
-        cl.show(panelCont,"waitingRoom");
+        cl.show(panelCont, "waitingRoom");
     }
 
     public void addPlayer(String playerName) {
