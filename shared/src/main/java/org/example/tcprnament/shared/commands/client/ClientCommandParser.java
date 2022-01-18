@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.tcprnament.shared.commands.client.concrete.CreateGameCommand;
 import org.example.tcprnament.shared.commands.client.concrete.JoinGameCommand;
 import org.example.tcprnament.shared.commands.client.concrete.QuestionAnswerCommand;
+import org.example.tcprnament.shared.commands.client.concrete.SetNickCommand;
 import org.example.tcprnament.shared.parser.CommandParser;
 
 @Slf4j
@@ -31,8 +32,13 @@ public abstract class ClientCommandParser extends CommandParser {
             case QUESTION_ANSWER:
                 onQuestionAnswer((QuestionAnswerCommand) clientCommand);
                 break;
+            case SET_NICK:
+                onSetNick((SetNickCommand) clientCommand);
+                break;
         }
     }
+
+    protected abstract void onSetNick(SetNickCommand command) ;
 
     protected abstract void onCreateGame(CreateGameCommand command);
 

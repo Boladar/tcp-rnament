@@ -12,6 +12,7 @@ import org.example.tcprnament.shared.commands.client.ClientCommandParser;
 import org.example.tcprnament.shared.commands.client.concrete.CreateGameCommand;
 import org.example.tcprnament.shared.commands.client.concrete.JoinGameCommand;
 import org.example.tcprnament.shared.commands.client.concrete.QuestionAnswerCommand;
+import org.example.tcprnament.shared.commands.client.concrete.SetNickCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommandType;
 import org.example.tcprnament.shared.commands.server.concrete.*;
@@ -38,9 +39,15 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
     private final Map<String, Game> currentGames = new ConcurrentHashMap<>();
     private final Map<String, String> gameOwnershipMap = new ConcurrentHashMap<>();
     private final Map<String, Game> playerGameMap = new ConcurrentHashMap<>();
+    private final Map<String, String> playerNick = new ConcurrentHashMap<>();
 
     private final ThreadFactory gameThreadFactory = new ThreadFactoryBuilder().setNameFormat("Game-thread-%d").build();
     private final ScheduledExecutorService gameExecutor = Executors.newScheduledThreadPool(10, gameThreadFactory);
+
+    @Override
+    protected void onSetNick(SetNickCommand command) {
+        playerNick.put(command.getConnectionId(),command.getNick());
+    }
 
     @Override
     protected void onCreateGame(CreateGameCommand command) {
@@ -82,7 +89,7 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
                 gateway.send(serialize(new GameJoinedCommand(command.getName())), command.getConnectionId());
 
                 selectedGame.getPlayers().forEach((player, score) -> {
-                    gateway.send(serialize(new PlayerJoinedCommand(command.getConnectionId())), player);
+                    gateway.send(serialize(new PlayerJoinedCommand(playerNick.get(command.getConnectionId()))), player);
                 });
             } else {
                 sendReject(command, "Game already started");
@@ -122,7 +129,7 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
                 log.info("Player : {}, left game : {}", command.getConnectionId(), g.getName());
 
                 g.getPlayers().forEach((player, score) -> {
-                    gateway.send(serialize(new PlayerLeftCommand(command.getConnectionId())), player);
+                    gateway.send(serialize(new PlayerLeftCommand(playerNick.get(command.getConnectionId()))), player);
                 });
                 return;
             }

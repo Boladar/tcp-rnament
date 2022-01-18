@@ -6,5 +6,6 @@ public enum ClientCommandType {
     JOIN_GAME,
     LEAVE_GAME,
     START_GAME,
-    QUESTION_ANSWER
+    QUESTION_ANSWER,
+    SET_NICK
 }

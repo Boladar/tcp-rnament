@@ -5,8 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.tcprnament.shared.commands.server.concrete.GameQuestionCommand;
 import org.example.tcprnament.shared.commands.server.concrete.GameScoreUpdateCommand;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class GameDealer implements Runnable {
@@ -30,7 +33,11 @@ public class GameDealer implements Runnable {
 
         boolean finished = game.getCurrentQuestion() >= game.getGameQuestions().size();
 
-        GameScoreUpdateCommand scoreUpdateCommand = new GameScoreUpdateCommand(game.getPlayers(), finished);
+        Map<String,Integer> nickToScoreMap = new HashMap<>();
+        game.getPlayers().forEach((key, value)->nickToScoreMap.put(application.getPlayerNick().get(key),value));
+
+
+        GameScoreUpdateCommand scoreUpdateCommand = new GameScoreUpdateCommand(nickToScoreMap, finished);
 
         game.getPlayers().forEach((player, score) -> {
             gateway.send(application.serialize(scoreUpdateCommand), player);

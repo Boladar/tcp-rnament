@@ -137,6 +137,7 @@ public class NewGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendNick(nickSetField.getText());
+                cl.show(panelCont, "menu");
             }
         });
 
@@ -236,8 +237,12 @@ public class NewGUI {
         }
     }
 
-    private void sendNick(){
-        this.sender.setNick();
+    private void sendNick(String nick){
+        try {
+            this.sender.setNick(nick);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendCreateGame(String name, String pass) {

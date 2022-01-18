@@ -9,6 +9,7 @@ import org.example.tcprnament.shared.commands.client.ClientCommandType;
 import org.example.tcprnament.shared.commands.client.concrete.CreateGameCommand;
 import org.example.tcprnament.shared.commands.client.concrete.JoinGameCommand;
 import org.example.tcprnament.shared.commands.client.concrete.QuestionAnswerCommand;
+import org.example.tcprnament.shared.commands.client.concrete.SetNickCommand;
 import org.springframework.integration.ip.tcp.serializer.ByteArrayCrLfSerializer;
 
 import java.io.IOException;
@@ -56,10 +57,11 @@ public class Sender {
     public void sendAnswer(int questionNumber, boolean ans) throws IOException {
         log.info("Sending answer for question {}: {}", questionNumber,ans);
         tournamentProtocolApplication.write(new QuestionAnswerCommand(commandCounter, questionNumber, ans), clientSocket.getOutputStream());
+        commandCounter++;
     }
 
-    public void setNick(String nick) {
-        log.info("Setting players nick to: "+nick);
-        //tournamentProtocolApplication.write(new
+    public void setNick(String nick) throws IOException {
+        log.info("Sending player's nick to be set to: "+nick);
+        tournamentProtocolApplication.write(new SetNickCommand(commandCounter,nick), clientSocket.getOutputStream());
     }
 }

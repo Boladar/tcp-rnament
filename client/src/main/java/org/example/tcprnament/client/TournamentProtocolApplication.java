@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.example.tcprnament.shared.commands.client.concrete.SetNickCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommandParser;
 import org.example.tcprnament.shared.commands.server.concrete.*;
@@ -87,6 +88,7 @@ public class TournamentProtocolApplication extends ServerCommandParser {
             gui.updateScoreBoard(builder.toString());
         }
     }
+
 
     @Override
     protected void onGameQuestion(GameQuestionCommand command) {
