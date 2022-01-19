@@ -60,9 +60,6 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
             playerGameMap.put(command.getConnectionId(), newGame);
 
             log.info("Created game with name {}", command.getName());
-            //setPlayersWrongTableCounter and lastAns
-            newGame.getPlayers().forEach((key, value) -> newGame.setWrongAnsCounter(key, 0));
-            newGame.getPlayers().forEach((key, value) -> newGame.setLastAns(key, -1));
             gateway.send(serialize(new GameCreatedCommand(command.getName())), command.getConnectionId());
         } else {
             sendReject(command, "Game with name " + command.getName() + " already exists");
@@ -115,6 +112,12 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
             log.info("Starting game: {}", gameName);
             requestedGame.setGameQuestions(questionsProviderService.pickNRandomQuestions(10));
             GameDealer dealer = new GameDealer(this, requestedGame);
+            //setPlayersWrongTableCounter and lastAns
+            requestedGame.getPlayers().forEach((key, value) -> requestedGame.setWrongAnsCounter(key, 0));
+            requestedGame.getPlayers().forEach((key, value) -> requestedGame.setLastAns(key, -1));
+
+            requestedGame.setCurrentState(GameState.GAME);
+
             gameExecutor.execute(dealer);
 
         } else {
@@ -147,10 +150,20 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
             Game playerGame = playerGameMap.get(command.getConnectionId());
             Question question = playerGame.getGameQuestions().get(command.getQuestionNumber() - 1);
 
+
             int wrongAnsCounter = playerGame.getWrongAnsCounter().get(command.getConnectionId());
             boolean isOldAns = playerGame.getLastAns().get(command.getConnectionId()).equals(command.getQuestionNumber());
 
-            if (isOldAns) {
+            if (command.getQuestionNumber() != playerGame.getCurrentQuestion()) {
+                log.info(
+                        "[Game : {} player : {}] --> this is not current question number {}. Current question for this game is {}",
+                        playerGame.getName(),
+                        command.getConnectionId(),
+                        command.getQuestionNumber(),
+                        playerGame.getGameQuestions()
+                );
+
+            }else if (isOldAns) {
                 log.info(
                         "[Game : {} player : {}] --> already answered for question number {}",
                         playerGame.getName(),
