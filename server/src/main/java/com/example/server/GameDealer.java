@@ -1,6 +1,7 @@
 package com.example.server;
 
 import com.example.server.model.Game;
+import com.example.server.model.GameState;
 import lombok.extern.slf4j.Slf4j;
 import org.example.tcprnament.shared.commands.server.concrete.GameQuestionCommand;
 import org.example.tcprnament.shared.commands.server.concrete.GameScoreUpdateCommand;
@@ -61,6 +62,7 @@ public class GameDealer implements Runnable {
             gameExecutor.schedule(this, 5, TimeUnit.SECONDS);
         } else{
             log.info("Game: {}, reached final question ending the game!", game.getName());
+            game.setCurrentState(GameState.FINISH);
         }
 
 
