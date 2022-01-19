@@ -68,7 +68,7 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
 
     @Override
     protected void onShowGames(ClientCommand command) {
-        List<String> gamesNames = currentGames.values().stream().map(Game::getName).collect(Collectors.toList());
+        List<String> gamesNames = currentGames.values().stream().filter(k->k.getCurrentState()==GameState.LOBBY).map(Game::getName).collect(Collectors.toList());
         gateway.send(serialize(new GamesListCommand(gamesNames)), command.getConnectionId());
     }
 

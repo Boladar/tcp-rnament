@@ -85,7 +85,6 @@ public class NewGUI {
         //menuPanel
         menuPanel.add(createGameButton);
         menuPanel.add(refreshGamesButton);
-        menuPanel.setBackground(Color.BLUE);
         model.addColumn("Name");
 
         menuPanel.add(activeGames);

@@ -63,6 +63,8 @@ public class GameDealer implements Runnable {
         } else{
             log.info("Game: {}, reached final question ending the game!", game.getName());
             game.setCurrentState(GameState.FINISH);
+            application.getCurrentGames().remove(game.getName());
+
         }
 
 
