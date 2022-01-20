@@ -117,7 +117,6 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
             requestedGame.getPlayers().forEach((key, value) -> requestedGame.setLastAns(key, -1));
 
             requestedGame.setCurrentState(GameState.GAME);
-
             gameExecutor.execute(dealer);
 
         } else {
@@ -168,7 +167,7 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
                         "[Game : {} player : {}] --> already answered for question number {}",
                         playerGame.getName(),
                         command.getConnectionId(),
-                        command.getQuestionNumber()
+                        playerGame.getGameQuestions()
                 );
                 sendReject(command, "Already answered for question number " + command.getQuestionNumber());
             }else if (command.getAnswer().equals(question.getCorrectAnswer()) && wrongAnsCounter < 3 ) {
@@ -176,18 +175,25 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
                         "[Game : {} player : {}] --> correct answer for question number: {}! +1 point",
                         playerGame.getName(),
                         command.getConnectionId(),
-                        command.getQuestionNumber()
+                        playerGame.getGameQuestions()
                 );
                 Integer previous = playerGame.getPlayers().get(command.getConnectionId());
                 playerGame.getPlayers().put(command.getConnectionId(), previous + 1);
                 playerGame.setWrongAnsCounter(command.getConnectionId(), 0);
                 playerGame.setLastAns(command.getConnectionId(), command.getQuestionNumber());
+
+                if(playerGame.getScheduledFuture().getDelay(TimeUnit.MILLISECONDS) > 500 ){
+                    playerGame.getScheduledFuture().cancel(true);
+                    GameDealer dealer = new GameDealer(this, playerGame);
+                    gameExecutor.execute(dealer);
+                }
+
             } else if(wrongAnsCounter < 3) {
                 log.info(
                         "[Game : {} player : {}] --> wrong answer for question number: {}! -2 points",
                         playerGame.getName(),
                         command.getConnectionId(),
-                        command.getQuestionNumber()
+                        playerGame.getGameQuestions()
                 );
 
                 Integer previous = playerGame.getPlayers().get(command.getConnectionId());
@@ -199,7 +205,7 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
                         "[Game : {} player : {}] --> ban from answering for question number: {}! due to 3 wrong ans before.",
                         playerGame.getName(),
                         command.getConnectionId(),
-                        command.getQuestionNumber()
+                        playerGame.getGameQuestions()
                 );
                 sendReject(command, "Player has been banned for wrong answers!");
                 playerGame.setWrongAnsCounter(command.getConnectionId(), 0);
