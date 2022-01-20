@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 
 @Getter
 @Setter
@@ -20,6 +21,8 @@ public class Game {
 
     private Map<String, Integer> wrongAnsCounter = new ConcurrentHashMap<>();
     private Map<String, Integer> lastAns = new ConcurrentHashMap<>();
+
+    ScheduledFuture<?> scheduledFuture;
 
     private int currentQuestion = 0;
     private List<Question> gameQuestions;

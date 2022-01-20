@@ -29,6 +29,9 @@ public class NewGUI {
     private boolean gameOwner = false;
     private int questionNumber;
 
+    private Thread updateGameList;
+    private GameState currGameState;
+
     JFrame frame = new JFrame();
     JPanel panelCont = new JPanel();
     JPanel menuPanel = new JPanel();
@@ -41,12 +44,11 @@ public class NewGUI {
 
     JButton createGameButton = new JButton("Create Game");
     JButton submitButton = new JButton("Submit");
-    JButton refreshGamesButton = new JButton("Refresh");
     JButton joinGameButton = new JButton("Join");
     JButton yesButton = new JButton("Yes");
     JButton noButton = new JButton("No");
     JButton startGameButton = new JButton("Start Game");
-    JButton goBackMenu = new JButton();
+    JButton goBackMenu = new JButton("Go back to Menu");
     JButton sendNickButton = new JButton("Set Nick");
 
     CardLayout cl = new CardLayout();
@@ -75,6 +77,9 @@ public class NewGUI {
         this.tournamentProtocolApplication = new TournamentProtocolApplication(clientSocket, this);
         this.sender = new Sender(clientSocket, tournamentProtocolApplication);
 
+        updateGameList = new Thread(new UpdateGameList(sender, this));
+        updateGameList.start();
+
         panelCont.setLayout(cl);
 
         //NickSetPanel
@@ -84,7 +89,6 @@ public class NewGUI {
 
         //menuPanel
         menuPanel.add(createGameButton);
-        menuPanel.add(refreshGamesButton);
         model.addColumn("Name");
 
         menuPanel.add(activeGames);
@@ -122,21 +126,23 @@ public class NewGUI {
         gameOver.add(goBackMenu);
 
         //panelContainer
-        panelCont.add(setNickPanel, "setNickPanel");
-        panelCont.add(menuPanel, "menu");
-        panelCont.add(createGamePanel, "createGame");
-        panelCont.add(loginPanel, "loginPanel");
-        panelCont.add(gamePanel, "gamePanel");
-        panelCont.add(waitingRoom, "waitingRoom");
-        panelCont.add(gameOver, "gameOver");
-        cl.show(panelCont, "setNickPanel");
+        panelCont.add(setNickPanel, GameState.SET_NICK.toString());
+        panelCont.add(menuPanel, GameState.MENU.toString());
+        panelCont.add(createGamePanel, GameState.CREATE_GAME.toString());
+        panelCont.add(loginPanel, GameState.LOGIN_PANEL.toString());
+        panelCont.add(gamePanel, GameState.GAME_PANEL.toString());
+        panelCont.add(waitingRoom, GameState.WAITING_ROOM.toString());
+        panelCont.add(gameOver, GameState.GAME_OVER.toString());
 
+        currGameState = GameState.SET_NICK;
+        cl.show(panelCont, currGameState.toString());
 
         sendNickButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendNick(nickSetField.getText());
-                cl.show(panelCont, "menu");
+                currGameState = GameState.MENU;
+                cl.show(panelCont, currGameState.toString());
             }
         });
 
@@ -147,17 +153,11 @@ public class NewGUI {
             }
         });
 
-        refreshGamesButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                UpdateGameTable();
-            }
-        });
-
         createGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cl.show(panelCont, "createGame");
+                currGameState = GameState.CREATE_GAME;
+                cl.show(panelCont, currGameState.toString());
             }
         });
 
@@ -182,8 +182,11 @@ public class NewGUI {
         activeGames.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                joinGameName = activeGames.getValueAt(activeGames.getSelectedRow(), 0).toString();
-                cl.show(panelCont, "loginPanel");
+                if(activeGames.getSelectedRow() > -1 && activeGames.getSelectedRow() < activeGames.getRowCount()){
+                    joinGameName = activeGames.getValueAt(activeGames.getSelectedRow(), 0).toString();
+                    currGameState = GameState.LOGIN_PANEL;
+                    cl.show(panelCont, currGameState.toString());
+                }
             }
         });
 
@@ -211,7 +214,14 @@ public class NewGUI {
         goBackMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cl.show(panelCont, "menu");
+                try {
+                    sender.getGameList();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                currGameState = GameState.MENU;
+                cl.show(panelCont, currGameState.toString());
+
             }
         });
 
@@ -283,12 +293,17 @@ public class NewGUI {
     public void gameListReceived(List<String> data) {
         log.info("revcived games: " + data);
         model.setRowCount(0);
-        data.forEach(r -> model.addRow(new Object[]{r}));
+        if(data.size() > 0){
+            data.forEach(r -> model.addRow(new Object[]{r}));
+        }
+
     }
 
     public void gameJoined() {
         // zmienic gui na to z gry + (info o dołączeniu do gry?)
-        cl.show(panelCont, "waitingRoom");
+        currGameState = GameState.WAITING_ROOM;
+        cl.show(panelCont, currGameState.toString());
+
     }
 
     public void addPlayer(String playerName) {
@@ -301,7 +316,9 @@ public class NewGUI {
 
     public void gameFinished(String finalScore) {
         this.gameOverLabel.setText(finalScore);
-        cl.show(panelCont, "gameOver");
+        currGameState = GameState.GAME_OVER;
+        cl.show(panelCont, currGameState.toString());
+
     }
 
     public void updateScoreBoard(String scoreboard) {
@@ -313,6 +330,7 @@ public class NewGUI {
     }
 
     public void gameStarted() {
-        cl.show(panelCont, "gamePanel");
+        currGameState = GameState.GAME_PANEL;
+        cl.show(panelCont, currGameState.toString());
     }
 }

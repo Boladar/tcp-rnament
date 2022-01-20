@@ -59,7 +59,7 @@ public class GameDealer implements Runnable {
             });
 
             game.setCurrentQuestion(game.getCurrentQuestion()+1);
-            gameExecutor.schedule(this, 5, TimeUnit.SECONDS);
+            game.setScheduledFuture(gameExecutor.schedule(this, 5, TimeUnit.SECONDS));
         } else{
             log.info("Game: {}, reached final question ending the game!", game.getName());
             game.setCurrentState(GameState.FINISH);
