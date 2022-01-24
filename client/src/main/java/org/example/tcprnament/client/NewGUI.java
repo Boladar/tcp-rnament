@@ -69,6 +69,9 @@ public class NewGUI {
 
     DefaultTableModel model = new DefaultTableModel();
     JTable activeGames = new JTable(model);
+//
+//    DefaultTableModel model2 = new DefaultTableModel();
+//    JTable lobbyPlayers = new JTable(model2);
 
     List<String> activePlayersList = new ArrayList<>();
 
@@ -88,10 +91,15 @@ public class NewGUI {
         setNickPanel.add(sendNickButton);
 
         //menuPanel
-        menuPanel.add(createGameButton);
+        BorderLayout bl = new BorderLayout();
+
+        menuPanel.setLayout(bl);
+        bl.setVgap(15);
+
+        menuPanel.add(createGameButton, BorderLayout.PAGE_START);
         model.addColumn("Name");
 
-        menuPanel.add(activeGames);
+        menuPanel.add(activeGames, BorderLayout.CENTER);
 
         //createGamePanel
         gameName.setPreferredSize(new Dimension(250, 40));
@@ -116,9 +124,12 @@ public class NewGUI {
         waitingRoom.add(startGameButton);
 
         //GamePanel
+        JPanel cont = new JPanel();
+        cont.add(yesButton);
+        cont.add(noButton);
+        gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.Y_AXIS));
         gamePanel.add(question);
-        gamePanel.add(yesButton);
-        gamePanel.add(noButton);
+        gamePanel.add(cont);
         gamePanel.add(scoreBoard);
 
         //gameOver
@@ -296,8 +307,8 @@ public class NewGUI {
         if(data.size() > 0){
             data.forEach(r -> model.addRow(new Object[]{r}));
         }
-
     }
+
 
     public void gameJoined() {
         // zmienic gui na to z gry + (info o dołączeniu do gry?)
@@ -308,6 +319,7 @@ public class NewGUI {
 
     public void addPlayer(String playerName) {
         this.activePlayersList.add(playerName);
+     //   model2.addRow(new Object[]{playerName});
     }
 
     public void removePlayer(String playerName) {
