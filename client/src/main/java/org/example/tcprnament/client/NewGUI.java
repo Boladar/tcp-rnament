@@ -72,6 +72,8 @@ public class NewGUI {
 //
 //    DefaultTableModel model2 = new DefaultTableModel();
 //    JTable lobbyPlayers = new JTable(model2);
+    DefaultListModel<String> listModel = new DefaultListModel();
+    JList LobbyPlayers = new JList(listModel);
 
     List<String> activePlayersList = new ArrayList<>();
 
@@ -120,8 +122,9 @@ public class NewGUI {
         loginPanel.add(joinGameButton);
 
         //WaitingRoom
-        waitingRoom.add(activePlayers);
         waitingRoom.add(startGameButton);
+        waitingRoom.add(LobbyPlayers);
+
 
         //GamePanel
         JPanel cont = new JPanel();
@@ -264,6 +267,13 @@ public class NewGUI {
             e.printStackTrace();
         }
     }
+    private void updateLobbyPlayers(List<String> players){
+        try {
+            this.sender.lobbyPlayersUpdate(players);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void sendCreateGame(String name, String pass) {
         try {
@@ -319,12 +329,22 @@ public class NewGUI {
 
     public void addPlayer(String playerName) {
         this.activePlayersList.add(playerName);
+        updateLobbyPlayers(activePlayersList);
+        //listModel.addElement(playerName);
+       // listModel.addAll(activePlayersList);
+
      //   model2.addRow(new Object[]{playerName});
+
     }
 
     public void removePlayer(String playerName) {
         this.activePlayersList.remove(playerName);
+        updateLobbyPlayers(activePlayersList);
+        //listModel.removeAllElements();
+       // listModel.addAll(activePlayersList);
+       // listModel.removeElement(playerName);
     }
+
 
     public void gameFinished(String finalScore) {
         this.gameOverLabel.setText(finalScore);
@@ -340,6 +360,7 @@ public class NewGUI {
     public void newQuestion(String question) {
         this.question.setText(question);
     }
+
 
     public void gameStarted() {
         currGameState = GameState.GAME_PANEL;

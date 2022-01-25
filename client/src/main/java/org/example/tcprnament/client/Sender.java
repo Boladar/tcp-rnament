@@ -6,14 +6,13 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.example.tcprnament.shared.commands.client.ClientCommand;
 import org.example.tcprnament.shared.commands.client.ClientCommandType;
-import org.example.tcprnament.shared.commands.client.concrete.CreateGameCommand;
-import org.example.tcprnament.shared.commands.client.concrete.JoinGameCommand;
-import org.example.tcprnament.shared.commands.client.concrete.QuestionAnswerCommand;
-import org.example.tcprnament.shared.commands.client.concrete.SetNickCommand;
+import org.example.tcprnament.shared.commands.client.concrete.*;
+import org.example.tcprnament.shared.commands.server.concrete.ShowPlayersListCommand;
 import org.springframework.integration.ip.tcp.serializer.ByteArrayCrLfSerializer;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 
 @Slf4j
 @Getter
@@ -63,5 +62,11 @@ public class Sender {
     public void setNick(String nick) throws IOException {
         log.info("Sending player's nick to be set to: "+nick);
         tournamentProtocolApplication.write(new SetNickCommand(commandCounter,nick), clientSocket.getOutputStream());
+        commandCounter++;
+    }
+    public void lobbyPlayersUpdate(List<String> players) throws IOException {
+        log.info("Sending lobby players update rewuest");
+        tournamentProtocolApplication.write(new GetPlayersListCommand(commandCounter,players),clientSocket.getOutputStream());
+        commandCounter++;
     }
 }

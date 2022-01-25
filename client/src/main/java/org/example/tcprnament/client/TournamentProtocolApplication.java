@@ -1,16 +1,13 @@
 package org.example.tcprnament.client;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.example.tcprnament.shared.commands.client.concrete.SetNickCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommandParser;
 import org.example.tcprnament.shared.commands.server.concrete.*;
 
 import java.net.Socket;
-import java.util.Vector;
 
 @Slf4j
 @Getter
@@ -95,5 +92,12 @@ public class TournamentProtocolApplication extends ServerCommandParser {
         log.info("New question: " + command.getQuestionNumber() + ". " + command.getText());
         gui.setQuestionNumber(command.getQuestionNumber());
         gui.newQuestion(command.getQuestionNumber() + ". " + command.getText());
+    }
+
+    @Override
+    protected void onPlayersLobbyUpdate(ShowPlayersListCommand command){
+        log.info("Player in lobby: "+ command.getPlayers().toString());
+        gui.listModel.removeAllElements();
+        gui.listModel.addAll(command.getPlayers());
     }
 }

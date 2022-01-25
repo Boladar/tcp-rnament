@@ -9,5 +9,6 @@ public enum ServerCommandType {
     PLAYER_JOINED,
     PLAYER_LEFT,
     GAME_SCORE_UPDATE,
-    GAME_QUESTION
+    GAME_QUESTION,
+    SHOW_PLAYERS_LIST
 }

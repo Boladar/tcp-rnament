@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.tcprnament.shared.commands.client.ClientCommand;
 import org.example.tcprnament.shared.commands.client.ClientCommandParser;
-import org.example.tcprnament.shared.commands.client.concrete.CreateGameCommand;
-import org.example.tcprnament.shared.commands.client.concrete.JoinGameCommand;
-import org.example.tcprnament.shared.commands.client.concrete.QuestionAnswerCommand;
-import org.example.tcprnament.shared.commands.client.concrete.SetNickCommand;
+import org.example.tcprnament.shared.commands.client.concrete.*;
 import org.example.tcprnament.shared.commands.server.ServerCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommandType;
 import org.example.tcprnament.shared.commands.server.concrete.*;
@@ -20,6 +17,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.integration.ip.tcp.connection.AbstractServerConnectionFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -87,7 +85,6 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
                 playerGameMap.put(command.getConnectionId(), selectedGame);
 
                 gateway.send(serialize(new GameJoinedCommand(command.getName())), command.getConnectionId());
-
                 selectedGame.getPlayers().forEach((player, score) -> {
                     gateway.send(serialize(new PlayerJoinedCommand(playerNick.get(command.getConnectionId()))), player);
                 });
@@ -141,6 +138,23 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
         }
 
         sendReject(command, "Player not in game");
+    }
+
+    @Override
+    protected void onPlayersListUpdate(GetPlayersListCommand command){
+
+        for(Game g : currentGames.values()){
+            if(g.getPlayers().containsKey(command.getConnectionId())){
+                List<String> playersNicks = new ArrayList<>();
+                List<String> players = new ArrayList<>(g.getPlayers().keySet());
+                for (String x: players){
+                    if (playerNick.containsKey(x)){
+                        playersNicks.add(playerNick.get(x));
+                    }
+                }
+                gateway.send(serialize(new ShowPlayersListCommand(playersNicks)),command.getConnectionId());
+            }
+        }
     }
 
     @Override
