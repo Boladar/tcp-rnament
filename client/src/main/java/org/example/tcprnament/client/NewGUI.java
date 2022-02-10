@@ -50,6 +50,7 @@ public class NewGUI {
     JButton startGameButton = new JButton("Start Game");
     JButton goBackMenu = new JButton("Go back to Menu");
     JButton sendNickButton = new JButton("Set Nick");
+    JButton leaveLobbyButton = new JButton("Leave Lobby");
 
     CardLayout cl = new CardLayout();
 
@@ -69,7 +70,7 @@ public class NewGUI {
 
     DefaultTableModel model = new DefaultTableModel();
     JTable activeGames = new JTable(model);
-//
+    //
 //    DefaultTableModel model2 = new DefaultTableModel();
 //    JTable lobbyPlayers = new JTable(model2);
     DefaultListModel<String> listModel = new DefaultListModel();
@@ -124,6 +125,7 @@ public class NewGUI {
         //WaitingRoom
         waitingRoom.add(startGameButton);
         waitingRoom.add(LobbyPlayers);
+        waitingRoom.add(leaveLobbyButton);
 
 
         //GamePanel
@@ -150,6 +152,16 @@ public class NewGUI {
 
         currGameState = GameState.SET_NICK;
         cl.show(panelCont, currGameState.toString());
+
+        leaveLobbyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendLeaveLobby("");
+                currGameState = GameState.MENU;
+                cl.show(panelCont,currGameState.toString());
+                updateLobbyPlayers(activePlayersList);
+            }
+        });
 
         sendNickButton.addActionListener(new ActionListener() {
             @Override
@@ -196,7 +208,7 @@ public class NewGUI {
         activeGames.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                if(activeGames.getSelectedRow() > -1 && activeGames.getSelectedRow() < activeGames.getRowCount()){
+                if (activeGames.getSelectedRow() > -1 && activeGames.getSelectedRow() < activeGames.getRowCount()) {
                     joinGameName = activeGames.getValueAt(activeGames.getSelectedRow(), 0).toString();
                     currGameState = GameState.LOGIN_PANEL;
                     cl.show(panelCont, currGameState.toString());
@@ -251,6 +263,13 @@ public class NewGUI {
         UpdateGameTable();
     }
 
+    private void sendLeaveLobby(String name){
+        try {
+            this.sender.sendLeaveLobby(name);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void UpdateGameTable() {
         try {
@@ -260,14 +279,15 @@ public class NewGUI {
         }
     }
 
-    private void sendNick(String nick){
+    private void sendNick(String nick) {
         try {
             this.sender.setNick(nick);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    private void updateLobbyPlayers(List<String> players){
+
+    private void updateLobbyPlayers(List<String> players) {
         try {
             this.sender.lobbyPlayersUpdate(players);
         } catch (IOException e) {
@@ -308,13 +328,13 @@ public class NewGUI {
     }
 
     public void rejectedInfoMessage(String reason) {
-        //wyswietlic (moze zawsze na gorze ekranu) odrzucono komende z jakiegos powodu?
+
     }
 
     public void gameListReceived(List<String> data) {
         log.info("revcived games: " + data);
         model.setRowCount(0);
-        if(data.size() > 0){
+        if (data.size() > 0) {
             data.forEach(r -> model.addRow(new Object[]{r}));
         }
     }
@@ -327,13 +347,18 @@ public class NewGUI {
 
     }
 
+    public void joinGameDenied() {
+        currGameState = GameState.MENU;
+        cl.show(panelCont, currGameState.toString());
+    }
+
     public void addPlayer(String playerName) {
         this.activePlayersList.add(playerName);
         updateLobbyPlayers(activePlayersList);
         //listModel.addElement(playerName);
-       // listModel.addAll(activePlayersList);
+        // listModel.addAll(activePlayersList);
 
-     //   model2.addRow(new Object[]{playerName});
+        //   model2.addRow(new Object[]{playerName});
 
     }
 
@@ -341,8 +366,8 @@ public class NewGUI {
         this.activePlayersList.remove(playerName);
         updateLobbyPlayers(activePlayersList);
         //listModel.removeAllElements();
-       // listModel.addAll(activePlayersList);
-       // listModel.removeElement(playerName);
+        // listModel.addAll(activePlayersList);
+        // listModel.removeElement(playerName);
     }
 
 

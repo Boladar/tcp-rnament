@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.tcprnament.shared.commands.client.ClientCommand;
 import org.example.tcprnament.shared.commands.client.ClientCommandType;
 import org.example.tcprnament.shared.commands.client.concrete.*;
+import org.example.tcprnament.shared.commands.server.concrete.PlayerLeftCommand;
 import org.example.tcprnament.shared.commands.server.concrete.ShowPlayersListCommand;
 import org.springframework.integration.ip.tcp.serializer.ByteArrayCrLfSerializer;
 
@@ -65,8 +66,14 @@ public class Sender {
         commandCounter++;
     }
     public void lobbyPlayersUpdate(List<String> players) throws IOException {
-        log.info("Sending lobby players update rewuest");
+        log.info("Sending lobby players update request");
         tournamentProtocolApplication.write(new GetPlayersListCommand(commandCounter,players),clientSocket.getOutputStream());
         commandCounter++;
     }
+    public void sendLeaveLobby(String name) throws IOException {
+        log.info("Sending leaving lobby request");
+        tournamentProtocolApplication.write(new PlayerLeftCommand(name),clientSocket.getOutputStream());
+    }
+
+
 }

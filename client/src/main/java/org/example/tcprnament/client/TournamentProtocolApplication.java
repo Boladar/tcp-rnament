@@ -3,6 +3,7 @@ package org.example.tcprnament.client;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.example.tcprnament.shared.commands.client.ClientCommandType;
 import org.example.tcprnament.shared.commands.server.ServerCommand;
 import org.example.tcprnament.shared.commands.server.ServerCommandParser;
 import org.example.tcprnament.shared.commands.server.concrete.*;
@@ -54,6 +55,9 @@ public class TournamentProtocolApplication extends ServerCommandParser {
     protected void onCommandRejected(CommandRejected command) {
         log.info("Last command rejected! Reason: " + command.getReason());
         gui.rejectedInfoMessage(command.getReason());
+        if(command.getRefCommandType()== ClientCommandType.JOIN_GAME){
+            gui.joinGameDenied();
+        }
     }
 
     @Override
