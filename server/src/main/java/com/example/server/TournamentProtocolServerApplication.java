@@ -78,6 +78,7 @@ public class TournamentProtocolServerApplication extends ClientCommandParser {
 
                 if (!selectedGame.getPassword().equals(command.getPassword())) {
                     sendReject(command, "Wrong password");
+                    return;
                 }
 
                 log.info("Player {}, joined game {}", command.getConnectionId(), selectedGame.getName());
