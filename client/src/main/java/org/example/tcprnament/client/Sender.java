@@ -72,7 +72,8 @@ public class Sender {
     }
     public void sendLeaveLobby(String name) throws IOException {
         log.info("Sending leaving lobby request");
-        tournamentProtocolApplication.write(new PlayerLeftCommand(name),clientSocket.getOutputStream());
+        tournamentProtocolApplication.write(new ClientCommand(commandCounter,ClientCommandType.LEAVE_GAME),clientSocket.getOutputStream());
+        commandCounter++;
     }
 
 
